@@ -2,13 +2,11 @@ import { LitElement, html, css, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import type { Tournament, Player } from "./_types/index";
 import tailwind from "@tailwind";
-import "@supersoniks/concorde/button";
-import "@supersoniks/concorde/loader";
 
 @customElement("chess-agenda-item")
 export class ChessAgendaItem extends LitElement {
   @property({ type: Object }) tournament!: Tournament;
-  @property({ type: String }) apiBaseUrl: string = "";
+  @property({ type: String }) apiBaseUrl: string = "http://localhost:3012";
   @property({ type: String }) club: string = "";
 
   @state() private players: Player[] = [];
@@ -63,9 +61,12 @@ export class ChessAgendaItem extends LitElement {
     this.loading = true;
 
     try {
-      const apiUrl = this.apiBaseUrl || "http://localhost:3012";
+      const apiUrl = this.apiBaseUrl;
+      const apiUrlWithoutTrailingSlash = apiUrl.endsWith("/")
+        ? apiUrl.slice(0, -1)
+        : apiUrl;
       const response = await fetch(
-        `${apiUrl}/api/tournaments/${this.tournament.id}/players`
+        `${apiUrlWithoutTrailingSlash}/api/tournaments/${this.tournament.id}/players`
       );
 
       if (!response.ok) {
@@ -118,20 +119,18 @@ export class ChessAgendaItem extends LitElement {
         <div class="text-xl font-bold mb-1">${this.tournament.name}</div>
 
         ${this.loading
-          ? html`<sonic-loader mode="inline"></sonic-loader>`
+          ? html`<div class="text-sm text-gray-500">Chargement...</div>`
           : nothing}
         ${this.clubParticipants.length > 0
           ? html`
-              <sonic-button
-                variant="outline"
-                size="xs"
-                class=" mt-1 "
+              <button
+                class="mt-1 px-3 py-1 text-xs border border-current rounded hover:bg-gray-100 transition-colors"
                 @click=${this.toggleParticipants}
               >
                 ${this.clubParticipants.length}
                 joueur${this.clubParticipants.length > 1 ? "s" : nothing} du
                 club ${this.club}
-              </sonic-button>
+              </button>
               ${this.showParticipants
                 ? html`
                     <div class="mt-2 pl-4 border-l border-current">

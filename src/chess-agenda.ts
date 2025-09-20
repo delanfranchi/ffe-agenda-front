@@ -1,7 +1,12 @@
 import { LitElement, html, css } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { repeat } from "lit/directives/repeat.js";
-import type { Tournament, ApiResponse, ChessAgendaProps } from "./_types/index";
+import type {
+  Tournament,
+  ApiResponse,
+  ChessAgendaProps,
+  TournamentListResponse,
+} from "./_types/index";
 import "./chess-agenda-item";
 import tailwind from "@tailwind";
 
@@ -11,8 +16,7 @@ export class ChessAgenda extends LitElement implements ChessAgendaProps {
   @property({ type: String }) club: string = "";
   @property({ type: Number }) limit: number = 20;
   @property({ type: Boolean }) showOnlyClub: boolean = false;
-  @property({ type: String }) apiBaseUrl: string =
-    "https://ffe-agenda-back.vercel.app/";
+  @property({ type: String }) apiBaseUrl: string = "http://localhost:3012";
 
   @state() private tournaments: Tournament[] = [];
   @state() private loading: boolean = false;
@@ -64,16 +68,24 @@ export class ChessAgenda extends LitElement implements ChessAgendaProps {
       }
 
       const apiUrl = this.apiBaseUrl;
-      const response = await fetch(`${apiUrl}/api/agenda?${params}`);
+      const apiUrlWithoutTrailingSlash = apiUrl.endsWith("/")
+        ? apiUrl.slice(0, -1)
+        : apiUrl;
+      const response = await fetch(
+        `${apiUrlWithoutTrailingSlash}/api/tournaments?${params}`
+      );
+      console.log(response);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data: ApiResponse<Tournament[]> = await response.json();
+      const responseData: ApiResponse<TournamentListResponse> =
+        await response.json();
+      console.log(responseData.data);
 
-      if (data.success && data.data) {
-        this.tournaments = data.data;
+      if (responseData.success && responseData.data) {
+        this.tournaments = responseData.data.tournaments;
         console.log("Tournaments loaded:", this.tournaments);
       } else {
         throw new Error(data.error || "Unknown error");

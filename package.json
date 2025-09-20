@@ -16,7 +16,6 @@
     "tailwindcss": "^3.4.17"
   },
   "devDependencies": {
-    "@supersoniks/concorde": "^3.1.100",
     "typescript": "~5.8.3",
     "vite": "^7.1.5"
   }

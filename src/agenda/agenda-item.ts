@@ -141,7 +141,9 @@ export class FfeAgendaItem extends LitElement {
               <div class="text-sm/tight ">
                 ${this.tournament.location} • ${this.tournament.department}
               </div>
-              <div class="text-lg/tight mb-1 font-bold font-headings">
+              <div
+                class="text-lg/tight mb-1 font-bold font-headings text-pretty"
+              >
                 ${this.tournament.name}
               </div>
             </div>

@@ -60,13 +60,6 @@ export class FfeDialog extends LitElement {
         transition-duration: 0.3s;
       }
 
-      @media (max-width: 640px) {
-        dialog {
-          max-width: 95vw;
-          margin: 1rem;
-        }
-      }
-
       @media (prefers-reduced-motion: reduce) {
         dialog {
           opacity: 1;

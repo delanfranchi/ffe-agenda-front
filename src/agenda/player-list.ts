@@ -38,7 +38,7 @@ export class FfePlayerList extends LitElement {
   render() {
     if (this.renderPlayers.length === 0) {
       return html`
-        <div class="text-center py-6 text-lg opacity-50">
+        <div class="text-center py-6 text-lg/tight opacity-50 text-pretty">
           La liste des participants n'est pas encore publiée
         </div>
       `;
@@ -56,23 +56,27 @@ export class FfePlayerList extends LitElement {
             const isLast = index === this.renderPlayers.length - 1;
             return html`
               <div
-                class="flex items-center  rounded-md p-2  w-full gap-3 hover:bg-[rgba(0,0,0,0.05)] transition-all duration-100"
+                class="flex items-center  rounded-md px-[2px] lg:p-x-2 py-2  w-full gap-3 hover:bg-[rgba(0,0,0,0.05)] transition-all duration-100"
               >
                 <div>
-                  <div class="font-medium">${player.name}</div>
+                  <div class="font-medium text-sm lg:text-base/tight">
+                    ${player.name}
+                  </div>
                 </div>
 
                 <div class="ml-auto flex items-center gap-2 ">
                   ${!this.showOnlyClub
                     ? html`<div
-                        class="text-xs ${matchClub
-                          ? "text-primary font-semibold "
+                        class="text-xs truncate max-w-[8.5rem] text-right  ${matchClub
+                          ? "text-primary font-semibold  "
                           : ""}"
                       >
                         ${player.club}
                       </div>`
                     : nothing}
-                  <div class="w-[8ch] text-right">${player.elo}</div>
+                  <div class="w-[6.5ch] text-right text-sm lg:text-base">
+                    ${player.elo}
+                  </div>
                 </div>
               </div>
               ${!isLast

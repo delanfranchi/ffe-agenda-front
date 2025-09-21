@@ -31,8 +31,7 @@ npm run build
 <chess-agenda 
   departements="[37,41,36]" 
   club="Echiquier Tourangeau"
-  limit="5"
-  apiBaseUrl="http://localhost:3012">
+  limit="5">
 </chess-agenda>
 ```
 
@@ -42,8 +41,7 @@ npm run build
 <chess-agenda 
   departements="[37,41,36]" 
   club="Echiquier Tourangeau"
-  limit="5"
-  apiBaseUrl="https://api.votre-domaine.com">
+  limit="5">
 </chess-agenda>
 ```
 
@@ -53,14 +51,18 @@ npm run build
 - `club` : Nom du club à mettre en valeur (optionnel)
 - `limit` : Nombre maximum de tournois à afficher (défaut: 10)
 - `showOnlyClub` : Afficher seulement les tournois avec des joueurs du club (défaut: false)
-- `apiBaseUrl` : URL de base de l'API backend (défaut: http://localhost:3012)
 
-## 🔧 API Backend
+## 🔧 Configuration API
 
-Le webcomponent utilise l'API `/api/agenda` avec le format REST standard :
+Le webcomponent est complètement découplé du backend. L'URL de l'API est configurée dans le fichier `src/global.ts` et peut être modifiée selon l'environnement :
+
+- **Développement** : `http://localhost:3012`
+- **Production** : `https://ffe-agenda-back.vercel.app`
+
+L'API utilise le format REST standard :
 - `department[]=37&department[]=41&department[]=36` pour les départements
 - `next=true` pour filtrer les événements à venir (inclut les événements du jour)
 
-## 🔗 Types partagés
+## 🔗 Types
 
-Les types sont partagés avec le backend via le lien symbolique `_types -> ../_types`.
+Les types sont définis dans le dossier `src/_types/` et sont utilisés par le webcomponent pour assurer la cohérence des données avec l'API backend.

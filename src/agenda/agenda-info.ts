@@ -156,7 +156,7 @@ export class FfeAgendaInfo extends LitElement {
               ${tournament.location} • ${tournament.department}
             </div>
             <div
-              class="text-xl/tight lg:text-2xl  font-bold font-headings mb-6"
+              class="text-xl/tight lg:text-2xl/tight  font-bold font-headings mb-6 pr-6 text-pretty"
             >
               ${tournament.name}
             </div>

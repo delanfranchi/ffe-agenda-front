@@ -1,0 +1,22 @@
+:root {
+  --ffe-base: #fff;
+  --ffe-base-content: #000;
+}
+
+body {
+  background: var(--ffe-neutral-bg);
+  color: var(--ffe-neutral-content);
+  font-family: sans-serif;
+  padding: 4rem;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.test-section {
+  border-radius: 2rem;
+  box-shadow: 0 0 2rem 0 rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+}

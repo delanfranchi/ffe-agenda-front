@@ -6,17 +6,19 @@ import type {
   ApiResponse,
   ChessAgendaProps,
   TournamentListResponse,
-} from "./_types/index";
-import "./chess-agenda-item";
+} from "../_types/index";
+import "./agenda-item";
+import "../loader";
 import tailwind from "@tailwind";
 
-@customElement("chess-agenda")
-export class ChessAgenda extends LitElement implements ChessAgendaProps {
+@customElement("ffe-agenda-widget")
+export class FfeAgendaWidget extends LitElement implements ChessAgendaProps {
   @property({ type: Array }) departements: number[] = [];
   @property({ type: String }) club: string = "";
   @property({ type: Number }) limit: number = 20;
   @property({ type: Boolean }) showOnlyClub: boolean = false;
-  @property({ type: String }) apiBaseUrl: string = "http://localhost:3012";
+  @property({ type: String }) apiBaseUrl: string =
+    "https://ffe-agenda-back.vercel.app";
 
   @state() private tournaments: Tournament[] = [];
   @state() private loading: boolean = false;
@@ -27,13 +29,6 @@ export class ChessAgenda extends LitElement implements ChessAgendaProps {
     css`
       :host {
         display: block;
-      }
-
-      chess-agenda-item {
-        display: block;
-        margin: 0 0 1.25em 0;
-        padding-bottom: 1.25em;
-        border-bottom: 1px solid currentColor;
       }
     `,
   ];
@@ -88,7 +83,7 @@ export class ChessAgenda extends LitElement implements ChessAgendaProps {
         this.tournaments = responseData.data.tournaments;
         console.log("Tournaments loaded:", this.tournaments);
       } else {
-        throw new Error(data.error || "Unknown error");
+        throw new Error(responseData.error || "Unknown error");
       }
     } catch (error) {
       this.error = error instanceof Error ? error.message : "Unknown error";
@@ -100,11 +95,7 @@ export class ChessAgenda extends LitElement implements ChessAgendaProps {
 
   render() {
     if (this.loading) {
-      return html`
-        <div>
-          <div class="text-center p-2">Chargement des tournois...</div>
-        </div>
-      `;
+      return html` <ffe-agenda-loader></ffe-agenda-loader> `;
     }
 
     if (this.error) {
@@ -129,12 +120,13 @@ export class ChessAgenda extends LitElement implements ChessAgendaProps {
           this.tournaments,
           (tournament) => tournament.id,
           (tournament) => html`
-            <chess-agenda-item
+            <ffe-agenda-item
               .tournament=${tournament}
               .apiBaseUrl=${this.apiBaseUrl}
               .club=${this.club}
+              class="block border-b-2 border-current"
             >
-            </chess-agenda-item>
+            </ffe-agenda-item>
           `
         )}
       </div>

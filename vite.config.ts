@@ -1,11 +1,11 @@
 import { defineConfig } from "vite";
-import tailwindcss from "@tailwindcss/vite";
 import { fileURLToPath } from "node:url";
+import postcssLit from "rollup-plugin-postcss-lit";
 
 export default defineConfig({
   build: {
     lib: {
-      entry: "src/chess-agenda.ts",
+      entry: "src/index.ts",
       formats: ["es"],
       fileName: "chess-agenda",
     },
@@ -14,7 +14,7 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3013,
+    port: 3015,
     cors: true,
   },
   resolve: {
@@ -24,5 +24,9 @@ export default defineConfig({
       ),
     },
   },
-  plugins: [tailwindcss()],
+  plugins: [
+    postcssLit({
+      include: ["/src/**/*.css", "/src/**/*.css?*"],
+    }),
+  ],
 });

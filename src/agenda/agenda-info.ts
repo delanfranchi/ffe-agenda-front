@@ -164,11 +164,12 @@ export class FfeAgendaInfo extends LitElement {
             <div class="mb-8">
               <a
                 href="${tournament.url}"
-                class="btn btn-outline"
+                class="flex items-center gap-2 font-semibold group"
                 target="_blank"
                 rel="noopener"
               >
-                ${icon("arrowRight")} Voir sur le site FFE
+                ${icon("arrowRight")}
+                <span class="group-hover:underline">Voir sur le site FFE</span>
               </a>
             </div>
           </div>

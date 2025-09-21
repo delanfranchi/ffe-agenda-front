@@ -15,6 +15,11 @@ export class FfeDialog extends LitElement {
         display: block;
       }
 
+      /* Prevent body scroll when dialog is open */
+      body:has(dialog[open]) {
+        overflow: hidden;
+      }
+
       dialog {
         background: var(--ffe-neutral-bg, #fff);
         border: none;
@@ -25,10 +30,13 @@ export class FfeDialog extends LitElement {
         width: 44rem;
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         position: fixed;
+        top: 50%;
+        left: 50%;
+        margin: 0;
+        transform: translate(-50%, -50%) translateY(-20px);
 
         /* Initial hidden state */
         opacity: 0;
-        transform: translateY(-20px);
       }
 
       dialog::-webkit-scrollbar {
@@ -90,7 +98,6 @@ export class FfeDialog extends LitElement {
       document.body.setAttribute("inert", "");
       this.dialogElement.showModal();
       this.open = true;
-
       this.animateIn();
     }
   }
@@ -114,7 +121,8 @@ export class FfeDialog extends LitElement {
       if (prefersReducedMotion) {
         // Skip animation for accessibility
         this.dialogElement.style.opacity = "1";
-        this.dialogElement.style.transform = "translateY(0)";
+        this.dialogElement.style.transform =
+          "translate(-50%, -50%) translateY(0)";
         this.isAnimating = false;
         return;
       }
@@ -138,7 +146,10 @@ export class FfeDialog extends LitElement {
       );
 
       this.currentAnimation = this.dialogElement.animate(
-        [{ transform: "translateY(20px)" }, { transform: "translateY(0)" }],
+        [
+          { transform: "translate(-50%, -50%) translateY(20px)" },
+          { transform: "translate(-50%, -50%) translateY(0)" },
+        ],
         {
           duration: 200,
           easing: "cubic-bezier(0.4, 0, 0.2, 1)", // ease
@@ -187,7 +198,10 @@ export class FfeDialog extends LitElement {
       );
 
       this.currentAnimation = this.dialogElement.animate(
-        [{ transform: "translateY(0)" }, { transform: "translateY(20px)" }],
+        [
+          { transform: "translate(-50%, -50%) translateY(0)" },
+          { transform: "translate(-50%, -50%) translateY(20px)" },
+        ],
         {
           duration: 200,
           easing: "cubic-bezier(0.4, 0, 0.2, 1)", // ease
@@ -221,7 +235,7 @@ export class FfeDialog extends LitElement {
         id="dialog"
         @click=${this.handleBackdropClick}
         @close=${this.handleClose}
-        class="relative p-5 lg:p-6"
+        class="p-5 lg:p-6"
       >
         ${this.title
           ? html`<div

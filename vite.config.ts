@@ -7,10 +7,7 @@ export default defineConfig({
     lib: {
       entry: "src/index.ts",
       formats: ["es"],
-      fileName: "chess-agenda",
-    },
-    rollupOptions: {
-      external: /^lit/,
+      fileName: "ffe-agenda-webcomponent",
     },
   },
   server: {

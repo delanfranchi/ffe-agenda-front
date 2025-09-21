@@ -22,6 +22,7 @@ export default defineConfig({
       "@tailwind": fileURLToPath(
         new URL("./src/css/tailwind.ts", import.meta.url)
       ),
+      "@types": fileURLToPath(new URL("./src/_types", import.meta.url)),
     },
   },
   plugins: [

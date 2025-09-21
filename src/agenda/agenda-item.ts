@@ -1,14 +1,17 @@
 import { LitElement, html, css, nothing } from "lit";
-import { customElement, property, state } from "lit/decorators.js";
-import type { Tournament, Player } from "../_types/index";
+import { customElement, property, query, state } from "lit/decorators.js";
+import type { Tournament, Player } from "@types";
 import tailwind from "@tailwind";
 import "./club-participants";
+import "./agenda-info";
+import "../dialog";
+import { unsafeHTML } from "lit/directives/unsafe-html.js";
+import { FfeDialog } from "../dialog";
+import { API_URL } from "../const";
 
 @customElement("ffe-agenda-item")
 export class FfeAgendaItem extends LitElement {
   @property({ type: Object }) tournament!: Tournament;
-  @property({ type: String }) apiBaseUrl: string =
-    "https://ffe-agenda-back.vercel.app";
   @property({ type: String }) club: string = "";
 
   @state() private players: Player[] = [];
@@ -16,7 +19,16 @@ export class FfeAgendaItem extends LitElement {
   @state() private loading: boolean = false;
   @state() private loaded: boolean = false;
 
+  @query("#infoDialog") private infoDialog!: FfeDialog;
+
   private observer?: IntersectionObserver;
+
+  svgInfo = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info">
+      <circle cx="12" cy="12" r="10"></circle>
+      <path d="m9,12 3,3 3,-3"></path>
+    </svg>
+  `;
 
   static styles = [
     tailwind,
@@ -62,7 +74,7 @@ export class FfeAgendaItem extends LitElement {
     this.loading = true;
 
     try {
-      const apiUrl = this.apiBaseUrl;
+      const apiUrl = API_URL;
       const apiUrlWithoutTrailingSlash = apiUrl.endsWith("/")
         ? apiUrl.slice(0, -1)
         : apiUrl;
@@ -125,20 +137,49 @@ export class FfeAgendaItem extends LitElement {
     `;
   }
 
+  showInfoDialog() {
+    // Récupérer le dialog à chaque fois pour s'assurer qu'il existe
+    const dialogElement = this.infoDialog;
+    if (dialogElement && dialogElement.show) {
+      dialogElement.show();
+    }
+  }
+
   render() {
     return html`
       <div class="py-3">
-        <div class="text-sm/tight ">
-          ${this.formatDate(this.tournament.date)} ― ${this.tournament.location}
-          (${this.tournament.department})
-        </div>
-        <div class="text-lg/tight  mb-1 ">
-          ${this.formatName(this.tournament.name)}
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <div class="text-sm/tight ">
+              ${this.formatDate(this.tournament.date)} ―
+              ${this.tournament.location} (${this.tournament.department})
+            </div>
+            <div class="text-lg/tight mb-1">
+              ${this.formatName(this.tournament.name)}
+            </div>
+          </div>
         </div>
 
-        <ffe-club-participants
-          .participants=${this.clubParticipants}
-        ></ffe-club-participants>
+        <div class="flex items-center gap-2">
+          <ffe-club-participants
+            .participants=${this.clubParticipants}
+          ></ffe-club-participants>
+
+          <button
+            @click=${this.showInfoDialog}
+            class="bg-transparent flex items-center gap-2"
+            title="Informations détaillées"
+          >
+            ${unsafeHTML(this.svgInfo)} Infos
+          </button>
+        </div>
+
+        <ffe-dialog id="infoDialog">
+          <ffe-agenda-info
+            .tournament=${this.tournament}
+            .club=${this.club}
+          ></ffe-agenda-info>
+        </ffe-dialog>
       </div>
     `;
   }

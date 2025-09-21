@@ -6,10 +6,11 @@ import type {
   ApiResponse,
   ChessAgendaProps,
   TournamentListResponse,
-} from "../_types/index";
+} from "@types";
 import "./agenda-item";
 import "../loader";
 import tailwind from "@tailwind";
+import { API_URL } from "../const";
 
 @customElement("ffe-agenda-widget")
 export class FfeAgendaWidget extends LitElement implements ChessAgendaProps {
@@ -17,8 +18,6 @@ export class FfeAgendaWidget extends LitElement implements ChessAgendaProps {
   @property({ type: String }) club: string = "";
   @property({ type: Number }) limit: number = 20;
   @property({ type: Boolean }) showOnlyClub: boolean = false;
-  @property({ type: String }) apiBaseUrl: string =
-    "https://ffe-agenda-back.vercel.app";
 
   @state() private tournaments: Tournament[] = [];
   @state() private loading: boolean = false;
@@ -62,7 +61,7 @@ export class FfeAgendaWidget extends LitElement implements ChessAgendaProps {
         params.set("club", this.club);
       }
 
-      const apiUrl = this.apiBaseUrl;
+      const apiUrl = API_URL;
       const apiUrlWithoutTrailingSlash = apiUrl.endsWith("/")
         ? apiUrl.slice(0, -1)
         : apiUrl;
@@ -122,7 +121,6 @@ export class FfeAgendaWidget extends LitElement implements ChessAgendaProps {
           (tournament) => html`
             <ffe-agenda-item
               .tournament=${tournament}
-              .apiBaseUrl=${this.apiBaseUrl}
               .club=${this.club}
               class="block border-b-2 border-current"
             >

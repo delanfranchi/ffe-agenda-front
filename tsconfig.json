@@ -23,7 +23,8 @@
     "noUncheckedSideEffectImports": true,
     "types": ["./src/css/tailwind.d.ts"],
     "paths": {
-      "@tailwind": ["./src/css/tailwind.ts"]
+      "@tailwind": ["./src/css/tailwind.ts"],
+      "@types": ["./src/_types"]
     }
   },
   "include": ["src"]

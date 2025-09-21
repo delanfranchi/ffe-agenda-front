@@ -1,8 +1,9 @@
 import { LitElement, html, css, nothing } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import tailwind from "@tailwind";
-import type { Player } from "../_types/index";
+import type { Player } from "@types";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
+import "../dialog";
 
 @customElement("ffe-club-participants")
 export class FfeClubParticipants extends LitElement {
@@ -22,44 +23,14 @@ export class FfeClubParticipants extends LitElement {
       :host {
         display: block;
       }
-
-      /* Styles pour l'API Popover native */
-      [popover] {
-        position: fixed;
-        inset: 0;
-        width: fit-content;
-        height: fit-content;
-        margin: auto;
-        border-radius: 0.5rem;
-        padding: 1rem;
-        background: white;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-          0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        color: #1f2937;
-        overflow: auto;
-      }
-
-      /* Style personnalisé quand le popover est ouvert */
-      :popover-open {
-        width: 300px;
-        height: fit-content;
-        position: absolute;
-        inset: unset;
-        margin: 0;
-      }
     `,
   ];
 
-  togglePop() {
-    const popover = this.renderRoot.querySelector(
-      "#participantsPopover"
-    ) as HTMLElement;
-    if (popover) {
-      if (popover.matches(":popover-open")) {
-        popover.hidePopover();
-      } else {
-        popover.showPopover();
-      }
+  showDialog() {
+    // Récupérer le dialog à chaque fois pour s'assurer qu'il existe
+    const dialogElement = this.renderRoot.querySelector("ffe-dialog") as any;
+    if (dialogElement && dialogElement.show) {
+      dialogElement.show();
     }
   }
 
@@ -69,35 +40,39 @@ export class FfeClubParticipants extends LitElement {
       this.participants.length === 1
         ? "Participant du club"
         : "Participants du club";
+
+    console.log(this.participants);
     return html`
       <div class="relative">
         <button
           id="participantsButton"
-          @click=${this.togglePop}
-          class="px-3 py-1   rounded-full text-sm bg-neutral-content text-neutral-bg flex items-center gap-2 font-bold"
+          @click=${this.showDialog}
+          class="px-3 py-1 rounded-full text-sm bg-neutral-content text-neutral-bg flex items-center gap-2 font-bold hover:bg-neutral-200 transition-colors"
         >
           ${unsafeHTML(this.svgUser)}
-          <span>${this.participants.length} ${text} </span>
+          <span>${this.participants.length} ${text}</span>
         </button>
 
-        <div id="participantsPopover" popover>
+        <ffe-dialog title="Participants du club">
           ${this.participants.length === 0
-            ? html`<div class="text-gray-500">Aucun participant du club</div>`
+            ? html`<div class="text-gray-500 text-center py-4">
+                Aucun participant du club
+              </div>`
             : html`
-                <ul class="space-y-2">
+                <div class="space-y-2">
                   ${this.participants.map(
                     (participant) => html`
-                      <li class="flex items-center gap-2">
-                        <span class="font-medium">${participant.name}</span>
-                        <span class="text-sm text-gray-500"
-                          >(${participant.elo})</span
-                        >
-                      </li>
+                      <div class="flex items-center justify-between  ">
+                        <div>
+                          <div class="font-medium ">${participant.name}</div>
+                        </div>
+                        <div>${participant.elo}</div>
+                      </div>
                     `
                   )}
-                </ul>
+                </div>
               `}
-        </div>
+        </ffe-dialog>
       </div>
     `;
   }

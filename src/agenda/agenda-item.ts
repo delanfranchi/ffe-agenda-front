@@ -1,4 +1,4 @@
-import { LitElement, html, css } from "lit";
+import { LitElement, html, css, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import type { Tournament, Player } from "../_types/index";
 import tailwind from "@tailwind";
@@ -106,15 +106,34 @@ export class FfeAgendaItem extends LitElement {
     });
   }
 
+  private formatName(name: string) {
+    // Extract text in parentheses using regex
+    const match = name.match(/\((.*?)\)/);
+    let textInparenthesis = "";
+    if (match) {
+      textInparenthesis = match[1].trim();
+    }
+
+    const textWithoutTextInparenthesis = name
+      .replace(match?.[0] || "", "")
+      .trim();
+    return html`
+      <div class="font-bold">${textWithoutTextInparenthesis}</div>
+      ${textInparenthesis
+        ? html`<div class="text-[.85em]">(${textInparenthesis})</div>`
+        : nothing}
+    `;
+  }
+
   render() {
     return html`
       <div class="py-3">
-        <div class="text-sm leading-tight">
+        <div class="text-sm/tight ">
           ${this.formatDate(this.tournament.date)} ― ${this.tournament.location}
           (${this.tournament.department})
         </div>
-        <div class="text-xl font-bold mb-1 leading-tight">
-          ${this.tournament.name}
+        <div class="text-lg/tight  mb-1 ">
+          ${this.formatName(this.tournament.name)}
         </div>
 
         <ffe-club-participants

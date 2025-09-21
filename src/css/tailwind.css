@@ -11,7 +11,11 @@
 
 @layer components {
   .btn {
-    @apply transition-all  duration-100 min-h-[2em] bg-transparent border-current flex items-center gap-2 border-2 rounded-md px-2 py-1 text-sm font-semibold;
+    @apply transition-all  duration-100 min-h-[2em] bg-transparent border-current inline-flex items-center gap-2 border-2 rounded-md px-2 py-1 text-sm font-semibold;
+  }
+  .btn:focus-visible {
+    @apply outline-none;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2);
   }
   .btn[data-active] {
     @apply bg-neutral-content text-neutral-bg border-neutral-content;

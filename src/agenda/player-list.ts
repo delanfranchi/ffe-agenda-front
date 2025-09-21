@@ -30,13 +30,15 @@ export class FfePlayerList extends LitElement {
   }
 
   protected willUpdate(_changedProperties: PropertyValues): void {
-    this.renderPlayers = this.showOnlyClub ? this.clubPlayers : this.players;
+    const players = this.showOnlyClub ? this.clubPlayers : this.players;
+    const sortedPlayers = players.sort((a, b) => b.elo - a.elo);
+    this.renderPlayers = sortedPlayers;
   }
 
   render() {
     if (this.renderPlayers.length === 0) {
       return html`
-        <div class="text-center py-4 text-lg opacity-50">
+        <div class="text-center py-6 text-lg opacity-50">
           Aucun participant pour l'instant
         </div>
       `;

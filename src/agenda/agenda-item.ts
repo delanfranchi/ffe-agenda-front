@@ -159,10 +159,7 @@ export class FfeAgendaItem extends LitElement {
                   class="btn btn-primary"
                 >
                   ${icon("user")}
-                  <span class="hidden lg:block">${buttonText}</span>
-                  <span class="block lg:hidden"
-                    >${clubParticipantsCount} du club</span
-                  >
+                  <span>${clubParticipantsCount} du club</span>
                 </button> `
               : nothing}
           </div>

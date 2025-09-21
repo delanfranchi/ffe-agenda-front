@@ -39,7 +39,7 @@ export class FfePlayerList extends LitElement {
     if (this.renderPlayers.length === 0) {
       return html`
         <div class="text-center py-6 text-lg opacity-50">
-          Aucun participant pour l'instant
+          La liste des participants n'est pas encore publiée
         </div>
       `;
     }

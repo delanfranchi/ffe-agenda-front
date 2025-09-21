@@ -13,6 +13,7 @@ export class FfeAgendaInfo extends LitElement {
   @property({ type: String }) club: string = "";
 
   @state() private players: Player[] = [];
+  @state() private details: Tournament | null = null;
   @state() private loading: boolean = false;
   @state() private loaded: boolean = false;
   @state() private showOnlyClub: boolean = false;
@@ -51,76 +52,155 @@ export class FfeAgendaInfo extends LitElement {
     this.loading = true;
 
     try {
-      const apiUrl = API_URL;
-      const apiUrlWithoutTrailingSlash = apiUrl.endsWith("/")
-        ? apiUrl.slice(0, -1)
-        : apiUrl;
+      const baseUrl = this.getBaseApiUrl();
+      const tournamentId = this.tournament.id;
 
-      const requestUrl = `${apiUrlWithoutTrailingSlash}/api/tournaments/${this.tournament.id}/players`;
+      // Fetch both players and details in parallel for better performance
+      const [playersResponse, detailsResponse] = await Promise.all([
+        this.fetchTournamentData(
+          `${baseUrl}/api/tournaments/${tournamentId}/players`
+        ),
+        this.fetchTournamentData(`${baseUrl}/api/tournaments/${tournamentId}`),
+      ]);
 
-      const response = await fetch(requestUrl, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        signal: AbortSignal.timeout(10000), // 10 second timeout
-      });
+      // Process players data
+      this.players = this.extractPlayersFromResponse(playersResponse);
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Response error text:", errorText);
-        throw new Error(
-          `HTTP error! status: ${response.status}, message: ${errorText}`
-        );
-      }
+      // Process tournament details
+      this.details = this.extractDetailsFromResponse(detailsResponse);
 
-      const data = await response.json();
-
-      if (data.success && data.data) {
-        this.players = data.data;
-        this.loaded = true;
-      } else {
-        console.warn("Response format unexpected:", data);
-        // Fallback: try to use the data directly if it's an array
-        if (Array.isArray(data)) {
-          this.players = data;
-          this.loaded = true;
-        }
-      }
+      this.loaded = true;
     } catch (error) {
-      console.error("Error loading tournament details:", error);
-      // Set empty players array on error to prevent UI issues
-      this.players = [];
-      this.loaded = true; // Mark as loaded to prevent retry loops
+      this.handleLoadError(error);
     } finally {
       this.loading = false;
     }
   }
 
+  private getBaseApiUrl(): string {
+    const apiUrl = API_URL;
+    return apiUrl.endsWith("/") ? apiUrl.slice(0, -1) : apiUrl;
+  }
+
+  private async fetchTournamentData(url: string): Promise<any> {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      signal: AbortSignal.timeout(10000),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
+    }
+
+    return response.json();
+  }
+
+  private extractPlayersFromResponse(response: any): Player[] {
+    if (response.success && Array.isArray(response.data)) {
+      return response.data;
+    }
+
+    // Fallback: if response is directly an array
+    if (Array.isArray(response)) {
+      return response;
+    }
+
+    console.warn("Unexpected players response format:", response);
+    return [];
+  }
+
+  private extractDetailsFromResponse(response: any): Tournament | null {
+    if (response.success && response.data?.tournament) {
+      return response.data.tournament;
+    }
+
+    if (response.success && response.data) {
+      return response.data;
+    }
+
+    console.warn("Unexpected details response format:", response);
+    return null;
+  }
+
+  private handleLoadError(error: any): void {
+    console.error("Error loading tournament details:", error);
+    this.players = [];
+    this.details = null;
+    this.loaded = true; // Mark as loaded to prevent retry loops
+  }
+
   render() {
     if (!this.tournament) return nothing;
+
+    const tournamentData = this.details || this.tournament;
     const clubPlayerCount = getClubParticipantsCount(this.players, this.club);
 
     return html`
+      ${this.renderTournamentHeader(tournamentData)}
+      ${this.renderParticipantControls(clubPlayerCount)}
+      ${this.renderPlayerList()}
+    `;
+  }
+
+  private renderTournamentHeader(tournament: Tournament) {
+    return html`
       <div class="flex items-start gap-2">
-        <div class="shrink-0">${dateMarkup(this.tournament)}</div>
+        <div class="shrink-0">${dateMarkup(tournament)}</div>
         <div class="flex items-start justify-between pt-1">
           <div class="flex-1">
-            <div class="text-sm/tight ">
-              ${this.tournament.location} • ${this.tournament.department}
+            <div class="text-sm/tight">
+              ${tournament.location} • ${tournament.department}
             </div>
-            <div class="text-lg/tight mb-1 font-bold font-headings">
-              ${this.tournament.name}
+            <div
+              class="text-xl/tight lg:text-2xl  font-bold font-headings mb-6"
+            >
+              ${tournament.name}
             </div>
-            <div class="mb-6">
-              <a href="${this.tournament.url}" class="btn btn-outline">
-                ${icon("arrowRight")} Voir sur le site FFE</a
+            ${this.renderTournamentDetails()}
+            <div class="mb-8">
+              <a
+                href="${tournament.url}"
+                class="btn btn-outline"
+                target="_blank"
+                rel="noopener"
               >
+                ${icon("arrowRight")} Voir sur le site FFE
+              </a>
             </div>
           </div>
         </div>
       </div>
+    `;
+  }
 
+  private renderTournamentDetails() {
+    const detail = this.details;
+    if (!detail) return nothing;
+    return html`
+      <div class="flex gap-x-5 flex-wrap my-2">
+        ${this.info("Rondes", detail.rounds)}
+        ${this.info("Cadence", detail.timeControl)}
+        ${this.info("Appariement", detail.pairingSystem)}
+      </div>
+      <div class="mb-3">${detail.address}</div>
+    `;
+  }
+
+  private info(label: string, value?: string | number) {
+    if (!value) return nothing;
+    return html` <div class="flex gap-2">
+      <div class="font-semibold">${label}</div>
+      <div>${value}</div>
+    </div>`;
+  }
+
+  private renderParticipantControls(clubPlayerCount: number) {
+    if (this.players.length === 0) return nothing;
+    return html`
       <div class="flex justify-between items-center mb-1">
         <div class="flex gap-2">
           <button
@@ -130,7 +210,7 @@ export class FfeAgendaInfo extends LitElement {
           >
             ${icon("user")} Tous les participants (${this.players.length})
           </button>
-          ${this.club && clubPlayerCount
+          ${this.club && clubPlayerCount > 0
             ? html`
                 <button
                   data-active=${this.showOnlyClub || nothing}
@@ -143,6 +223,11 @@ export class FfeAgendaInfo extends LitElement {
             : nothing}
         </div>
       </div>
+    `;
+  }
+
+  private renderPlayerList() {
+    return html`
       <ffe-player-list
         .players=${this.players}
         .club=${this.club}

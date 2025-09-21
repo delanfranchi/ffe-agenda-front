@@ -24,20 +24,32 @@ export class FfeDialog extends LitElement {
         max-height: 95vh;
         width: 44rem;
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        position: fixed;
+
+        /* Initial hidden state */
+        opacity: 0;
+        transform: translateY(-20px);
       }
+
       dialog::-webkit-scrollbar {
         border-radius: 5px;
         width: 3px;
         background: transparent;
       }
+
       dialog::-webkit-scrollbar-thumb {
         background: var(--ffe-neutral-content, #000);
         border-radius: 5px;
       }
 
-      dialog::backdrop {
+      dialog[open]::backdrop {
         background: rgba(0, 0, 0, 0.2);
         backdrop-filter: blur(4px);
+        backdrop-filter: blur(0px);
+      }
+      dialog::backdrop {
+        transition-delay: 0.2s;
+        transition-duration: 0.3s;
       }
 
       @media (max-width: 640px) {
@@ -46,10 +58,26 @@ export class FfeDialog extends LitElement {
           margin: 1rem;
         }
       }
+
+      @media (prefers-reduced-motion: reduce) {
+        dialog {
+          opacity: 1;
+          transform: none;
+        }
+
+        dialog::backdrop {
+          background: rgba(0, 0, 0, 0.2);
+          backdrop-filter: blur(4px);
+        }
+      }
     `,
   ];
 
   @query("#dialog") private dialogElement!: HTMLDialogElement;
+
+  private currentAnimation: Animation | null = null;
+  private currentOpacityAnimation: Animation | null = null;
+  private isAnimating = false;
 
   disconnectedCallback() {
     super.disconnectedCallback();
@@ -57,20 +85,121 @@ export class FfeDialog extends LitElement {
   }
 
   show() {
-    if (this.dialogElement) {
+    if (this.dialogElement && !this.isAnimating) {
       // Désactiver l'interactivité du body avec inert
       document.body.setAttribute("inert", "");
       this.dialogElement.showModal();
       this.open = true;
+
+      this.animateIn();
     }
   }
 
   hide() {
-    if (this.dialogElement) {
-      // Restaurer l'interactivité du body
-      document.body.removeAttribute("inert");
-      this.dialogElement.close();
+    if (this.dialogElement && !this.isAnimating) {
       this.open = false;
+      this.animateOut();
+    }
+  }
+
+  private animateIn() {
+    if (this.dialogElement && !this.isAnimating) {
+      this.isAnimating = true;
+
+      // Check for reduced motion preference
+      const prefersReducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+
+      if (prefersReducedMotion) {
+        // Skip animation for accessibility
+        this.dialogElement.style.opacity = "1";
+        this.dialogElement.style.transform = "translateY(0)";
+        this.isAnimating = false;
+        return;
+      }
+
+      // Cancel any existing animations
+      if (this.currentAnimation) {
+        this.currentAnimation.cancel();
+      }
+      if (this.currentOpacityAnimation) {
+        this.currentOpacityAnimation.cancel();
+      }
+
+      // Animate dialog - separate animations for opacity and transform
+      this.currentOpacityAnimation = this.dialogElement.animate(
+        [{ opacity: 0 }, { opacity: 1 }],
+        {
+          duration: 200,
+          easing: "linear",
+          fill: "forwards",
+        }
+      );
+
+      this.currentAnimation = this.dialogElement.animate(
+        [{ transform: "translateY(20px)" }, { transform: "translateY(0)" }],
+        {
+          duration: 200,
+          easing: "cubic-bezier(0.4, 0, 0.2, 1)", // ease
+          fill: "forwards",
+        }
+      );
+      this.currentAnimation.addEventListener("finish", () => {
+        this.isAnimating = false;
+      });
+    }
+  }
+
+  private animateOut() {
+    if (this.dialogElement && !this.isAnimating) {
+      this.isAnimating = true;
+
+      // Check for reduced motion preference
+      const prefersReducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+
+      if (prefersReducedMotion) {
+        // Skip animation for accessibility
+        this.dialogElement.close();
+        document.body.removeAttribute("inert");
+        this.isAnimating = false;
+        return;
+      }
+
+      // Cancel any existing animations
+      if (this.currentAnimation) {
+        this.currentAnimation.cancel();
+      }
+      if (this.currentOpacityAnimation) {
+        this.currentOpacityAnimation.cancel();
+      }
+
+      // Animate dialog out - separate animations for opacity and transform
+      this.currentOpacityAnimation = this.dialogElement.animate(
+        [{ opacity: 1 }, { opacity: 0 }],
+        {
+          duration: 200,
+          easing: "linear",
+          fill: "forwards",
+        }
+      );
+
+      this.currentAnimation = this.dialogElement.animate(
+        [{ transform: "translateY(0)" }, { transform: "translateY(20px)" }],
+        {
+          duration: 200,
+          easing: "cubic-bezier(0.4, 0, 0.2, 1)", // ease
+          fill: "forwards",
+        }
+      );
+
+      this.currentAnimation.addEventListener("finish", () => {
+        this.dialogElement.close();
+        document.body.removeAttribute("inert");
+        this.isAnimating = false;
+      });
     }
   }
 

@@ -16,14 +16,23 @@ export class FfeDialog extends LitElement {
       }
 
       dialog {
+        background: var(--ffe-neutral-bg, #fff);
         border: none;
         border-radius: 0.75rem;
         padding: 0;
         max-width: 95vw;
         max-height: 95vh;
         width: 44rem;
-        background: white;
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      }
+      dialog::-webkit-scrollbar {
+        border-radius: 5px;
+        width: 3px;
+        background: transparent;
+      }
+      dialog::-webkit-scrollbar-thumb {
+        background: var(--ffe-neutral-content, #000);
+        border-radius: 5px;
       }
 
       dialog::backdrop {
@@ -86,7 +95,9 @@ export class FfeDialog extends LitElement {
         class="relative p-5 lg:p-6"
       >
         ${this.title
-          ? html`<div class="text-2xl font-bold font-headings mb-3">
+          ? html`<div
+              class="text-2xl font-bold font-headings mb-3 text-pretty pr-6"
+            >
               ${this.title}
             </div>`
           : nothing}

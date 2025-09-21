@@ -6,8 +6,8 @@ module.exports = {
       transparent: "transparent",
       current: "currentColor",
       neutral: {
-        bg: "var(--ffe-base)",
-        content: "var(--ffe-base-content)",
+        bg: "var(--ffe-neutral-bg)",
+        content: "var(--ffe-neutral-content)",
       },
       primary: {
         DEFAULT: "var(--ffe-primary)",

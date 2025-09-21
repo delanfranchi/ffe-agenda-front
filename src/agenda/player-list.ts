@@ -36,7 +36,9 @@ export class FfePlayerList extends LitElement {
   render() {
     if (this.renderPlayers.length === 0) {
       return html`
-        <div class="text-center py-4">Aucun participant du club</div>
+        <div class="text-center py-4 text-lg opacity-50">
+          Aucun participant pour l'instant
+        </div>
       `;
     }
 
@@ -46,29 +48,36 @@ export class FfePlayerList extends LitElement {
           this.renderPlayers,
           (player) => player.id,
           (player, index) => {
-            const matchClub =
-              this.showOnlyClub &&
-              player.club.toLowerCase().includes(this.club.toLowerCase());
-            const isOdd = index % 2 === 0;
+            const matchClub = player.club
+              .toLowerCase()
+              .includes(this.club.toLowerCase());
+            const isLast = index === this.renderPlayers.length - 1;
             return html`
               <div
-                class="flex items-center justify-between rounded-md p-2 ${isOdd
-                  ? "bg-[rgba(0,0,0,0.05)]"
-                  : ""}"
+                class="flex items-center  rounded-md p-2  w-full gap-3 hover:bg-[rgba(0,0,0,0.05)] transition-all duration-100"
               >
                 <div>
                   <div class="font-medium">${player.name}</div>
+                </div>
 
+                <div class="ml-auto flex items-center gap-2 ">
                   ${!this.showOnlyClub
                     ? html`<div
-                        class="text-sm ${matchClub ? "text-primary" : ""}"
+                        class="text-xs ${matchClub
+                          ? "text-primary font-semibold "
+                          : ""}"
                       >
                         ${player.club}
                       </div>`
                     : nothing}
+                  <div class="w-[8ch] text-right">${player.elo}</div>
                 </div>
-                <div>${player.elo}</div>
               </div>
+              ${!isLast
+                ? html`<div
+                    class="border-b border-current border-dashed"
+                  ></div>`
+                : nothing}
             `;
           }
         )}

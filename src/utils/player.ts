@@ -9,3 +9,9 @@ export const getClubParticipants = (players: Player[], club: string) => {
     player.club?.toLowerCase().includes(club.toLowerCase())
   );
 };
+
+export const getClubParticipantsCount = (players: Player[], club: string) => {
+  return players.filter((player) =>
+    player.club?.toLowerCase().includes(club.toLowerCase())
+  )?.length;
+};

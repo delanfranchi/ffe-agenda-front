@@ -5,10 +5,11 @@ import tailwind from "@tailwind";
 import "./agenda-info";
 import "../dialog";
 import { FfeDialog } from "../dialog";
-import { API_URL } from "../const";
+import { API_URL } from "../global";
 import { icon } from "../_svg";
 import { getClubParticipants } from "../utils/player";
 import "./player-list";
+import { dateMarkup } from "../utils/tournament";
 
 @customElement("ffe-agenda-item")
 export class FfeAgendaItem extends LitElement {
@@ -109,30 +110,6 @@ export class FfeAgendaItem extends LitElement {
     this.clubParticipants = getClubParticipants(this.players, this.club);
   }
 
-  private formatDate(date: string): string {
-    return new Date(date).toLocaleDateString("fr-FR", {
-      year: "numeric",
-      month: "short",
-      day: "2-digit",
-    });
-  }
-
-  private formatDay(date: string): string {
-    return new Date(date).toLocaleDateString("fr-FR", {
-      day: "2-digit",
-    });
-  }
-  private formatMonth(date: string): string {
-    return new Date(date).toLocaleDateString("fr-FR", {
-      month: "short",
-    });
-  }
-  private formatYear(date: string): string {
-    return new Date(date).toLocaleDateString("fr-FR", {
-      year: "numeric",
-    });
-  }
-
   showInfoDialog() {
     // Récupérer le dialog à chaque fois pour s'assurer qu'il existe
     const dialogElement = this.infoDialog;
@@ -152,28 +129,17 @@ export class FfeAgendaItem extends LitElement {
     const clubParticipantsCount = this.clubParticipants.length;
     const buttonText =
       clubParticipantsCount > 1
-        ? `${clubParticipantsCount} Participants du club`
-        : `${clubParticipantsCount} Participant du club`;
-
-    const buttonDefaultClass =
-      "flex items-center gap-2 border-2 rounded-md px-2 py-1 text-sm font-semibold";
-
-    const day = this.formatDay(this.tournament.date);
-    const month = this.formatMonth(this.tournament.date);
-    const year = this.formatYear(this.tournament.date);
+        ? `${clubParticipantsCount} participant·e·s du club`
+        : `${clubParticipantsCount} participant·e du club`;
 
     return html`
       <div class="py-4 flex gap-3">
-        <div class="flex flex-col items-center uppercase w-14">
-          <div class="text-3xl/none font-bold">${day}</div>
-          <div class="text-lg/none">${month}</div>
-          <div class="text-sm/none mt-1">${year}</div>
-        </div>
+        <div class="shrink-0">${dateMarkup(this.tournament)}</div>
         <div>
-          <div class="flex items-start justify-between">
+          <div class="flex items-start justify-between pt-1">
             <div class="flex-1">
               <div class="text-sm/tight ">
-                ${this.tournament.location} • ${this.tournament.department})
+                ${this.tournament.location} • ${this.tournament.department}
               </div>
               <div class="text-lg/tight mb-1 font-bold font-headings">
                 ${this.tournament.name}
@@ -182,21 +148,21 @@ export class FfeAgendaItem extends LitElement {
           </div>
 
           <div class="flex items-center gap-2">
-            <button
-              @click=${this.showInfoDialog}
-              class="${buttonDefaultClass} bg-transparent border-current "
-            >
-              ${icon("info")} Infos
+            <button @click=${this.showInfoDialog} class="btn">
+              ${icon("info")} <span class="hidden lg:block">Infos</span>
             </button>
 
             ${this.clubParticipants.length > 0
               ? html`<button
                   id="participantsButton"
                   @click=${this.showParticipantsDialog}
-                  class="${buttonDefaultClass} border-primary bg-primary text-primary-content"
+                  class="btn btn-primary"
                 >
                   ${icon("user")}
-                  <span>${buttonText}</span>
+                  <span class="hidden lg:block">${buttonText}</span>
+                  <span class="block lg:hidden"
+                    >${clubParticipantsCount} du club</span
+                  >
                 </button> `
               : nothing}
           </div>

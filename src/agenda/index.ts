@@ -10,7 +10,7 @@ import type {
 import "./agenda-item";
 import "../loader";
 import tailwind from "@tailwind";
-import { API_URL } from "../const";
+import { API_URL } from "../global";
 
 @customElement("ffe-agenda-widget")
 export class FfeAgendaWidget extends LitElement implements ChessAgendaProps {
@@ -68,7 +68,6 @@ export class FfeAgendaWidget extends LitElement implements ChessAgendaProps {
       const response = await fetch(
         `${apiUrlWithoutTrailingSlash}/api/tournaments?${params}`
       );
-      console.log(response);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -76,17 +75,14 @@ export class FfeAgendaWidget extends LitElement implements ChessAgendaProps {
 
       const responseData: ApiResponse<TournamentListResponse> =
         await response.json();
-      console.log(responseData.data);
 
       if (responseData.success && responseData.data) {
         this.tournaments = responseData.data.tournaments;
-        console.log("Tournaments loaded:", this.tournaments);
       } else {
         throw new Error(responseData.error || "Unknown error");
       }
     } catch (error) {
       this.error = error instanceof Error ? error.message : "Unknown error";
-      console.error("Error loading tournaments:", error);
     } finally {
       this.loading = false;
     }

@@ -8,3 +8,16 @@
     font-family: var(--ffe-font-family-base), sans-serif;
   }
 }
+
+@layer components {
+  .btn {
+    @apply transition-all  duration-100 min-h-[2em] bg-transparent border-current flex items-center gap-2 border-2 rounded-md px-2 py-1 text-sm font-semibold;
+  }
+  .btn[data-active] {
+    @apply bg-neutral-content text-neutral-bg border-neutral-content;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-primary-content border-primary;
+  }
+}

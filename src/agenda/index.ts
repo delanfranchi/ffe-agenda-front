@@ -14,15 +14,6 @@ import { API_URL } from "../const";
 
 @customElement("ffe-agenda-widget")
 export class FfeAgendaWidget extends LitElement implements ChessAgendaProps {
-  @property({ type: Array }) departements: number[] = [];
-  @property({ type: String }) club: string = "";
-  @property({ type: Number }) limit: number = 20;
-  @property({ type: Boolean }) showOnlyClub: boolean = false;
-
-  @state() private tournaments: Tournament[] = [];
-  @state() private loading: boolean = false;
-  @state() private error: string | null = null;
-
   static styles = [
     tailwind,
     css`
@@ -31,6 +22,15 @@ export class FfeAgendaWidget extends LitElement implements ChessAgendaProps {
       }
     `,
   ];
+
+  @property({ type: Array }) departements: number[] = [];
+  @property({ type: String }) club: string = "";
+  @property({ type: Number }) limit: number = 20;
+  @property({ type: Boolean }) showOnlyClub: boolean = false;
+
+  @state() private tournaments: Tournament[] = [];
+  @state() private loading: boolean = false;
+  @state() private error: string | null = null;
 
   connectedCallback() {
     super.connectedCallback();

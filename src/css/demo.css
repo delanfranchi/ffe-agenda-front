@@ -1,12 +1,16 @@
 :root {
-  --ffe-base: #fff;
-  --ffe-base-content: #000;
+  --ffe-neutral-bg: #ddd;
+  --ffe-neutral-content: #111;
+  --ffe-headings-font-family: monospace;
+  --ffe-font-family-base: sans-serif;
+  --ffe-primary: blue;
+  --ffe-primary-content: #fff;
 }
 
 body {
   background: var(--ffe-neutral-bg);
   color: var(--ffe-neutral-content);
-  font-family: sans-serif;
+  font-family: var(--ffe-font-family-base);
   padding: 4rem;
 }
 

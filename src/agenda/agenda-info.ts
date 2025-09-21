@@ -197,43 +197,10 @@ export class FfeAgendaInfo extends LitElement {
         >
           Participants
         </h3>
-        ${this.loading
-          ? html`
-              <div class="flex justify-center items-center py-8">
-                <ffe-agenda-loader></ffe-agenda-loader>
-              </div>
-            `
-          : this.players.length === 0
-          ? html`
-              <div class="text-center text-gray-500 italic py-4">
-                Aucun participant trouvé
-              </div>
-            `
-          : html`
-              <div
-                class="max-h-[300px] overflow-y-auto border border-gray-200 rounded-lg p-3"
-              >
-                ${this.players.map(
-                  (player) => html`
-                    <div
-                      class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0"
-                    >
-                      <div>
-                        <div class="font-medium text-gray-900">
-                          ${player.name}
-                        </div>
-                        <div class="text-sm text-gray-500">${player.club}</div>
-                      </div>
-                      <div
-                        class="font-semibold text-green-700 bg-green-100 px-2 py-1 rounded-full text-sm"
-                      >
-                        ${player.elo}
-                      </div>
-                    </div>
-                  `
-                )}
-              </div>
-            `}
+        <ffe-player-list
+          .players=${this.players}
+          .club=${this.club}
+        ></ffe-player-list>
       </div>
 
       ${this.club && this.clubParticipants.length > 0
@@ -244,31 +211,11 @@ export class FfeAgendaInfo extends LitElement {
               >
                 Participants du club (${this.club})
               </h3>
-              <div
-                class="max-h-[300px] overflow-y-auto border border-gray-200 rounded-lg p-3"
-              >
-                ${this.clubParticipants.map(
-                  (participant) => html`
-                    <div
-                      class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0"
-                    >
-                      <div>
-                        <div class="font-medium text-gray-900">
-                          ${participant.name}
-                        </div>
-                        <div class="text-sm text-gray-500">
-                          ${participant.club}
-                        </div>
-                      </div>
-                      <div
-                        class="font-semibold text-green-700 bg-green-100 px-2 py-1 rounded-full text-sm"
-                      >
-                        ${participant.elo}
-                      </div>
-                    </div>
-                  `
-                )}
-              </div>
+              <ffe-player-list
+                .players=${this.clubParticipants}
+                .club=${this.club}
+                .showOnlyClub=${true}
+              ></ffe-player-list>
             </div>
           `
         : nothing}

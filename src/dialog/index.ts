@@ -1,11 +1,12 @@
-import { LitElement, html, css } from "lit";
-import { customElement, property } from "lit/decorators.js";
+import { LitElement, html, css, nothing } from "lit";
+import { customElement, property, query } from "lit/decorators.js";
 import tailwind from "@tailwind";
+import { unsafeHTML } from "lit/directives/unsafe-html.js";
 
 @customElement("ffe-dialog")
 export class FfeDialog extends LitElement {
-  @property({ type: String }) title: string = "";
   @property({ type: Boolean, reflect: true }) open: boolean = false;
+  @property({ type: String }) title: string = "";
 
   static styles = [
     tailwind,
@@ -26,7 +27,7 @@ export class FfeDialog extends LitElement {
       }
 
       dialog::backdrop {
-        background: rgba(0, 0, 0, 0.5);
+        background: rgba(0, 0, 0, 0.2);
         backdrop-filter: blur(4px);
       }
 
@@ -39,16 +40,17 @@ export class FfeDialog extends LitElement {
     `,
   ];
 
-  private dialogElement?: HTMLDialogElement;
+  @query("#dialog") private dialogElement!: HTMLDialogElement;
 
-  firstUpdated() {
-    this.dialogElement = this.renderRoot.querySelector(
-      "dialog"
-    ) as HTMLDialogElement;
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    document.body.removeAttribute("inert");
   }
 
   show() {
     if (this.dialogElement) {
+      // Désactiver l'interactivité du body avec inert
+      document.body.setAttribute("inert", "");
       this.dialogElement.showModal();
       this.open = true;
     }
@@ -56,6 +58,8 @@ export class FfeDialog extends LitElement {
 
   hide() {
     if (this.dialogElement) {
+      // Restaurer l'interactivité du body
+      document.body.removeAttribute("inert");
       this.dialogElement.close();
       this.open = false;
     }
@@ -71,24 +75,29 @@ export class FfeDialog extends LitElement {
     }
   }
 
+  closeSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+
   render() {
     return html`
-      <dialog @click=${this.handleBackdropClick} @close=${this.handleClose}>
-        <div
-          class="flex justify-between items-center px-6 pt-6 pb-0 border-b border-gray-200 mb-6"
+      <dialog
+        id="dialog"
+        @click=${this.handleBackdropClick}
+        @close=${this.handleClose}
+        class="relative p-5 lg:p-6"
+      >
+        ${this.title
+          ? html`<div class="text-2xl font-bold font-headings mb-3">
+              ${this.title}
+            </div>`
+          : nothing}
+        <button
+          class=" absolute top-3 right-3 z-10 bg-transparent border-none text-2xl text-neutral-content cursor-pointer p-1 rounded-md transition-all hover:bg-primary hover:text-primary-content"
+          @click=${this.handleClose}
+          aria-label="Fermer"
         >
-          <h2 class="text-xl font-semibold text-gray-900 m-0">${this.title}</h2>
-          <button
-            class="bg-transparent border-none text-2xl text-gray-500 cursor-pointer p-1 rounded-md transition-all hover:bg-gray-100 hover:text-gray-700"
-            @click=${this.handleClose}
-            aria-label="Fermer"
-          >
-            ×
-          </button>
-        </div>
-        <div class="px-6 pb-6 overflow-y-auto max-h-[70vh]">
-          <slot></slot>
-        </div>
+          ${unsafeHTML(this.closeSvg)}
+        </button>
+        <slot></slot>
       </dialog>
     `;
   }

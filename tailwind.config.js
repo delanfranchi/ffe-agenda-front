@@ -1,15 +1,7 @@
 module.exports = {
   content: ["./src/**/*.{js,ts,css}", "./index.html"],
   theme: {
-    borderRadius: {
-      none: "0",
-      sm: "var(--sc-rounded-sm)",
-      DEFAULT: "var(--sc-rounded)",
-      md: "var(--sc-rounded-md)",
-      lg: "var(--sc-rounded-lg)",
-      xl: "var(--sc-rounded-xl)",
-      full: "9999px",
-    },
+
     colors: {
       transparent: "transparent",
       current: "currentColor",
@@ -22,6 +14,9 @@ module.exports = {
         content: "var(--ffe-primary-content)",
       },
 
+    },
+    fontFamily: {
+      headings: ["var(--ffe-headings-font-family)"],
     },
   },
   plugins: [],

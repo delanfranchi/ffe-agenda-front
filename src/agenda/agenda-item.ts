@@ -2,12 +2,13 @@ import { LitElement, html, css, nothing } from "lit";
 import { customElement, property, query, state } from "lit/decorators.js";
 import type { Tournament, Player } from "@types";
 import tailwind from "@tailwind";
-import "./club-participants";
 import "./agenda-info";
 import "../dialog";
-import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import { FfeDialog } from "../dialog";
 import { API_URL } from "../const";
+import { icon } from "../_svg";
+import { getClubParticipants } from "../utils/player";
+import "./player-list";
 
 @customElement("ffe-agenda-item")
 export class FfeAgendaItem extends LitElement {
@@ -20,6 +21,7 @@ export class FfeAgendaItem extends LitElement {
   @state() private loaded: boolean = false;
 
   @query("#infoDialog") private infoDialog!: FfeDialog;
+  @query("#participantsDialog") private participantsDialog!: FfeDialog;
 
   private observer?: IntersectionObserver;
 
@@ -104,37 +106,31 @@ export class FfeAgendaItem extends LitElement {
       this.clubParticipants = [];
       return;
     }
-
-    this.clubParticipants = this.players.filter((player) =>
-      player.club.toLowerCase().includes(this.club.toLowerCase())
-    );
+    this.clubParticipants = getClubParticipants(this.players, this.club);
   }
 
   private formatDate(date: string): string {
     return new Date(date).toLocaleDateString("fr-FR", {
       year: "numeric",
       month: "short",
-      day: "numeric",
+      day: "2-digit",
     });
   }
 
-  private formatName(name: string) {
-    // Extract text in parentheses using regex
-    const match = name.match(/\((.*?)\)/);
-    let textInparenthesis = "";
-    if (match) {
-      textInparenthesis = match[1].trim();
-    }
-
-    const textWithoutTextInparenthesis = name
-      .replace(match?.[0] || "", "")
-      .trim();
-    return html`
-      <div class="font-bold">${textWithoutTextInparenthesis}</div>
-      ${textInparenthesis
-        ? html`<div class="text-[.85em]">(${textInparenthesis})</div>`
-        : nothing}
-    `;
+  private formatDay(date: string): string {
+    return new Date(date).toLocaleDateString("fr-FR", {
+      day: "2-digit",
+    });
+  }
+  private formatMonth(date: string): string {
+    return new Date(date).toLocaleDateString("fr-FR", {
+      month: "short",
+    });
+  }
+  private formatYear(date: string): string {
+    return new Date(date).toLocaleDateString("fr-FR", {
+      year: "numeric",
+    });
   }
 
   showInfoDialog() {
@@ -145,33 +141,65 @@ export class FfeAgendaItem extends LitElement {
     }
   }
 
+  showParticipantsDialog() {
+    const dialogElement = this.participantsDialog;
+    if (dialogElement && dialogElement.show) {
+      dialogElement.show();
+    }
+  }
+
   render() {
+    const clubParticipantsCount = this.clubParticipants.length;
+    const buttonText =
+      clubParticipantsCount > 1
+        ? `${clubParticipantsCount} Participants du club`
+        : `${clubParticipantsCount} Participant du club`;
+
+    const buttonDefaultClass =
+      "flex items-center gap-2 border-2 rounded-md px-2 py-1 text-sm font-semibold";
+
+    const day = this.formatDay(this.tournament.date);
+    const month = this.formatMonth(this.tournament.date);
+    const year = this.formatYear(this.tournament.date);
+
     return html`
-      <div class="py-3">
-        <div class="flex items-start justify-between">
-          <div class="flex-1">
-            <div class="text-sm/tight ">
-              ${this.formatDate(this.tournament.date)} ―
-              ${this.tournament.location} (${this.tournament.department})
-            </div>
-            <div class="text-lg/tight mb-1">
-              ${this.formatName(this.tournament.name)}
+      <div class="py-4 flex gap-3">
+        <div class="flex flex-col items-center uppercase w-14">
+          <div class="text-3xl/none font-bold">${day}</div>
+          <div class="text-lg/none">${month}</div>
+          <div class="text-sm/none mt-1">${year}</div>
+        </div>
+        <div>
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <div class="text-sm/tight ">
+                ${this.tournament.location} • ${this.tournament.department})
+              </div>
+              <div class="text-lg/tight mb-1 font-bold font-headings">
+                ${this.tournament.name}
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="flex items-center gap-2">
-          <ffe-club-participants
-            .participants=${this.clubParticipants}
-          ></ffe-club-participants>
+          <div class="flex items-center gap-2">
+            <button
+              @click=${this.showInfoDialog}
+              class="${buttonDefaultClass} bg-transparent border-current "
+            >
+              ${icon("info")} Infos
+            </button>
 
-          <button
-            @click=${this.showInfoDialog}
-            class="bg-transparent flex items-center gap-2"
-            title="Informations détaillées"
-          >
-            ${unsafeHTML(this.svgInfo)} Infos
-          </button>
+            ${this.clubParticipants.length > 0
+              ? html`<button
+                  id="participantsButton"
+                  @click=${this.showParticipantsDialog}
+                  class="${buttonDefaultClass} border-primary bg-primary text-primary-content"
+                >
+                  ${icon("user")}
+                  <span>${buttonText}</span>
+                </button> `
+              : nothing}
+          </div>
         </div>
 
         <ffe-dialog id="infoDialog">
@@ -179,6 +207,16 @@ export class FfeAgendaItem extends LitElement {
             .tournament=${this.tournament}
             .club=${this.club}
           ></ffe-agenda-info>
+        </ffe-dialog>
+
+        <ffe-dialog id="participantsDialog" title="${buttonText}">
+          ${this.clubParticipants.length > 0
+            ? html`<ffe-player-list
+                .club=${this.club}
+                .players=${this.clubParticipants}
+                .showOnlyClub=${true}
+              ></ffe-player-list>`
+            : nothing}
         </ffe-dialog>
       </div>
     `;

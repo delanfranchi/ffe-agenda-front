@@ -2,3 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 /* @import "tailwindcss"; */
+@layer base {
+  :host {
+    line-height: 1.2;
+    font-family: var(--ffe-font-family-base), sans-serif;
+  }
+}

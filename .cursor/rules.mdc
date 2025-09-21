@@ -1,0 +1,86 @@
+---
+alwaysApply: true
+---
+
+# Configuration Tailwind - Palette de couleurs limitée
+
+## Palette de couleurs disponible
+Cette configuration Tailwind utilise volontairement une palette de couleurs très limitée pour simplifier l'implémentation :
+
+### Couleurs disponibles :
+- `neutral-bg` : Variable CSS `--ffe-base`
+- `neutral-content` : Variable CSS `--ffe-base-content` 
+- `primary` : Variable CSS `--ffe-primary`
+- `primary-content` : Variable CSS `--ffe-primary-content`
+- `transparent` et `current` (couleurs Tailwind standard)
+
+### Classes Tailwind à utiliser :
+- `bg-neutral-bg` / `text-neutral-bg`
+- `bg-neutral-content` / `text-neutral-content`
+- `bg-primary` / `text-primary`
+- `bg-primary-content` / `text-primary-content`
+- `bg-transparent` / `text-transparent`
+
+## Règles importantes :
+1. **NE PAS utiliser** les couleurs Tailwind standard comme `gray-*`, `blue-*`, `red-*`, etc.
+2. **TOUJOURS utiliser** les couleurs personnalisées définies dans la configuration
+3. Les variables CSS sont définies dans les fichiers CSS du projet
+4. Cette limitation est volontaire pour maintenir une cohérence visuelle et simplifier le développement
+
+## Exemple d'utilisation correcte :
+```html
+<div class="bg-neutral-bg text-neutral-content">
+  <h1 class="text-primary font-headings">Titre</h1>
+  <button class="bg-primary text-primary-content">Bouton</button>
+</div>
+```
+
+## Exemple d'utilisation INCORRECTE :
+```html
+<!-- ❌ Ne pas utiliser -->
+<div class="bg-gray-100 text-gray-900">
+  <h1 class="text-blue-500">Titre</h1>
+  <button class="bg-red-500 text-white">Bouton</button>
+</div>
+```
+# Configuration Tailwind - Palette de couleurs limitée
+
+## Palette de couleurs disponible
+Cette configuration Tailwind utilise volontairement une palette de couleurs très limitée pour simplifier l'implémentation :
+
+### Couleurs disponibles :
+- `neutral-bg` : Variable CSS `--ffe-base`
+- `neutral-content` : Variable CSS `--ffe-base-content` 
+- `primary` : Variable CSS `--ffe-primary`
+- `primary-content` : Variable CSS `--ffe-primary-content`
+- `transparent` et `current` (couleurs Tailwind standard)
+
+### Classes Tailwind à utiliser :
+- `bg-neutral-bg` / `text-neutral-bg`
+- `bg-neutral-content` / `text-neutral-content`
+- `bg-primary` / `text-primary`
+- `bg-primary-content` / `text-primary-content`
+- `bg-transparent` / `text-transparent`
+
+## Règles importantes :
+1. **NE PAS utiliser** les couleurs Tailwind standard comme `gray-*`, `blue-*`, `red-*`, etc.
+2. **TOUJOURS utiliser** les couleurs personnalisées définies dans la configuration
+3. Les variables CSS sont définies dans les fichiers CSS du projet
+4. Cette limitation est volontaire pour maintenir une cohérence visuelle et simplifier le développement
+
+## Exemple d'utilisation correcte :
+```html
+<div class="bg-neutral-bg text-neutral-content">
+  <h1 class="text-primary font-headings">Titre</h1>
+  <button class="bg-primary text-primary-content">Bouton</button>
+</div>
+```
+
+## Exemple d'utilisation INCORRECTE :
+```html
+<!-- ❌ Ne pas utiliser -->
+<div class="bg-gray-100 text-gray-900">
+  <h1 class="text-blue-500">Titre</h1>
+  <button class="bg-red-500 text-white">Bouton</button>
+</div>
+```
